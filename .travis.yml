@@ -1,0 +1,29 @@
+sudo: required
+
+language: kotlin
+
+jdk:
+- oraclejdk8
+
+before_install:
+- chmod a+x gradlew
+
+script:
+- "./gradlew clean"
+- "./gradlew test"
+- "./gradlew jar"
+- "./gradlew sourcesJar"
+
+before_deploy:
+- git config --global user.email "builds@travis-ci.com"
+- git config --global user.name "Travis CI"
+
+deploy:
+  provider: releases
+  api_key:
+    secure: S5WzfaiZA1HQRn6jUKI9+ihE6twmuvG/WSM7czejZRGw6tv8uoj/6IuGaG9Q+dkLN1HNfudWHuHKXVMa7+F3XvSxbuwM/zGFOnj6muUVifBNXebr/v+3Y3MgxvfphKG/I0Q2RsFTGnvbA0v4WX9HGFpRF08aBhDG+j39HHOvbBh+YPIFUqzQRcep8rjvkUJ0eLTgus/qXRZL16lu2xymJ/fYjXTgIPhhKpu92jN+FPARCpt9+T+oXxowBzAQzJq1M7om/h3YGmjiqY4UDSjmZ1uJaOy/qbtQhN1LCd9ufeF2k3blxuTBpvLXn+u7qZ63ZN9ZssiiMCHIgBuaSCjmfEmfuYiXKlcSexQKMvirW4+0ZkUbLZgqHqKGvyBGTabuyqO/8zilqjA25bttBGJ/bJR4TlOkFfho1Of8q6jiQuDxBYn26v5+L36jx4yiK/MSv2pdPqB7YZ1EFcKInM/dz+rx1FIqqiRf18aTTB6V9fyTMiwq+CSKfwJd5tRg96o+x3gx+ompjJmkiHkVKnxWRqsBkmv2FsBiizR5zAxxb6cr7weRO6AZsnGxtMR0slBKHQ1ZR+9N4aYwEBME1GjpVaRr76HlZHUTOCtkuTE77z3023Mhn2dXQhsW6iFn418BxNNncCEldNwR4SFABcGsGJD0Ij1tfS27CpJ7hjVKzZM=
+  file: build/libs/Kt*.jar
+  file_glob: true
+  skip_cleanup: true
+  on:
+    repo: mslxl/kotlin-utilities
