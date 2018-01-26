@@ -6,8 +6,8 @@ import org.junit.Test
 class StringTest {
 
     @Test
-    fun mkString(){
-        arrayOf("h","e","l","l","o").mkString("[",",","]") shouldBe "[h,e,l,l,o]"
-        arrayOf("h","e","l","l","o").mkString(",") shouldBe "h,e,l,l,o"
+    fun mkString() {
+        arrayOf("h", "e", "l", "l", "o").mkString("[", ",", "]") shouldBe "[h,e,l,l,o]"
+        arrayOf("h", "e", "l", "l", "o").mkString(",") shouldBe "h,e,l,l,o"
     }
 }

@@ -1,12 +1,14 @@
 package io.github.mslxl.uitlities.log
 
+import io.kotlintest.matchers.shouldBe
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
 
 class LogTest {
     companion object {
-        var id:Int = 0
+        var id: Int = 0
+        var success = false
         @BeforeClass
         @JvmStatic
         fun listener() {
@@ -14,13 +16,16 @@ class LogTest {
             id = Logger.listen { source, s ->
                 val text = source.name + " : " + s.subSequence(0, if (s.length < 30) s.length - 1 else 30)
                 systemPrintln(text)
+                if ("Log te" in text) success = true
             }
         }
+
         @AfterClass
         @JvmStatic
-        fun after(){
+        fun after() {
             "unlisted log".log("Log Listener Test")
-            Logger.unlisten(id)
+            Logger.cancel(id)
+            success shouldBe true
         }
     }
 

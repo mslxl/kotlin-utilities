@@ -1,6 +1,5 @@
 package io.github.mslxl.uitlities.io
 
-import io.github.mslxl.uitlities.invoke
 import io.github.mslxl.uitlities.logic.isNotNull
 import io.github.mslxl.uitlities.logic.isNull
 import io.github.mslxl.uitlities.logic.whether
@@ -33,11 +32,10 @@ class Resource() {
                     createNewFile()
                     val output = file.outputStream()
                     it.copyTo(output)
-                    output.close()
                 }
             }.isNull {
-                error("$pathInClasspath not exists, check it exists or be loaded.")
-            }
+                        error("$pathInClasspath not exists, check it exists or be loaded.")
+                    }
         }
     }
 
@@ -45,10 +43,9 @@ class Resource() {
         relativePath = "${address.host}/${address.path}"
         mkParentDirs()
         file.whether { exists() }.isFalse {
-            address.openConnection()({
-                requestProperties.forEach { k, v -> it.setRequestProperty(k, v) }
-                it
-            }).getInputStream().use {
+            address.openConnection().apply {
+                requestProperties.forEach { k, v -> this.setRequestProperty(k, v) }
+            }.getInputStream().use {
                 createNewFile()
                 val output = file.outputStream()
                 it.copyTo(output)

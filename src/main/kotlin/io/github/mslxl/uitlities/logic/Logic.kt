@@ -1,25 +1,21 @@
 package io.github.mslxl.uitlities.logic
 
-import io.github.mslxl.uitlities.Block
-import io.github.mslxl.uitlities.BlockWithArgs
-import org.jetbrains.annotations.NotNull
-
-inline fun Boolean.isTrue(block: Block): Boolean {
+inline fun Boolean.isTrue(block: () -> Unit): Boolean {
     if (this) block.invoke()
     return this
 }
 
-inline fun Boolean.isFalse(block: Block): Boolean {
+inline fun Boolean.isFalse(block: () -> Unit): Boolean {
     if (!this) block.invoke()
     return this
 }
 
-inline fun <T : Any?> T.isNull(block: Block): T {
+inline fun <T : Any?> T.isNull(block: () -> Unit): T {
     if (this == null) block.invoke()
     return this
 }
 
-inline fun <T : Any> T?.isNotNull(@NotNull block: BlockWithArgs<T>): T? {
+inline fun <T : Any> T?.isNotNull(block: (T) -> Unit): T? {
     if (this != null) block.invoke(this)
     return this
 }

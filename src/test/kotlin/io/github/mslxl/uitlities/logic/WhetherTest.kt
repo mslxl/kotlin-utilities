@@ -6,9 +6,9 @@ import java.io.File
 
 class WhetherTest {
     @Test
-    fun whether(){
+    fun whether() {
         File("./deep_dark_fantasy.bug").parentFile
-                .whether{exists()}
+                .whether { exists() }
                 .isTrue {
                     "File parent '$absolutePath' exists".log("Whether Test")
                 }

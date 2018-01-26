@@ -1,6 +1,5 @@
 package io.github.mslxl.uitlities.log
 
-import io.github.mslxl.uitlities.BlockWithTwoArgs
 import io.github.mslxl.uitlities.catch
 import io.github.mslxl.uitlities.logic.isNotNull
 import io.github.mslxl.uitlities.string.mkString
@@ -11,13 +10,13 @@ import java.lang.management.ManagementFactory
 private val systemOutStream: PrintStream by lazy {
     // 当 Logger 初始化时拦截 System.out 使其强行经过 log
     val outStream = System.out
-    System.setOut(LoggerStream(outStream,{ systemPrint(it)},{it.log("Std")}))
+    System.setOut(LoggerStream(outStream, { systemPrint(it) }, { it.log("Std") }))
     return@lazy outStream
 }
 private val systemErrStream: PrintStream by lazy {
     // 当 Logger 初始化时拦截 System.out 使其强行经过 log
     val errStream = System.err
-    System.setErr(LoggerStream(errStream,{ systemErrPrint(it)},{it.err("Err")}))
+    System.setErr(LoggerStream(errStream, { systemErrPrint(it) }, { it.err("Err") }))
     return@lazy errStream
 }
 
@@ -28,7 +27,7 @@ internal fun systemErrPrint(any: Any?) = systemErrStream.print(any)
 internal fun systemErrPrintln(any: Any) = systemErrStream.println(any)
 internal fun systemErrPrint(charArray: CharArray) = systemErrStream.print(charArray)
 
-private fun preLog(tag: String ,config: LoggerConfig = GlobalLoggerConfig):String{
+private fun preLog(tag: String, config: LoggerConfig = GlobalLoggerConfig): String {
     val textTag = if (config.tag) " [ $tag ]" else ""
     val textTime = if (config.time) " [ ${config.timeFormat.format(System.currentTimeMillis())}]" else ""
     val textStartTime = if (config.startTime) " [ ${System.currentTimeMillis() - ManagementFactory.getRuntimeMXBean().startTime}ms ]" else ""
@@ -42,14 +41,14 @@ fun <T : Any?> T.log(tag: String = "Log", config: LoggerConfig = GlobalLoggerCon
 
 fun log(tag: String = "Log", vararg msg: Any?, config: LoggerConfig = GlobalLoggerConfig) {
     val text = msg.mkString(" ")
-    systemPrintln("${preLog(tag,config)} $text")
-    Logger.sendEvent(Logger.Source.STD,text)
+    systemPrintln("${preLog(tag, config)} $text")
+    Logger.sendEvent(Logger.Source.STD, text)
 }
 
-fun err(tag: String = "Err",vararg msg: Any?, config: LoggerConfig = GlobalLoggerConfig){
+fun err(tag: String = "Err", vararg msg: Any?, config: LoggerConfig = GlobalLoggerConfig) {
     val text = msg.mkString(" ")
-    systemErrPrintln("${ preLog(tag, config)} $text")
-    Logger.sendEvent(Logger.Source.ERR,text)
+    systemErrPrintln("${preLog(tag, config)} $text")
+    Logger.sendEvent(Logger.Source.ERR, text)
 }
 
 fun <T : Any?> T.err(tag: String = "Err", config: LoggerConfig = GlobalLoggerConfig): T {
@@ -57,19 +56,19 @@ fun <T : Any?> T.err(tag: String = "Err", config: LoggerConfig = GlobalLoggerCon
     return this
 }
 
-private fun <T:Throwable> preErr(exception: T):String{
-    synchronized(exception){
+private fun <T : Throwable> preErr(exception: T): String {
+    synchronized(exception) {
         return buildString {
-            with(exception){
+            with(exception) {
                 append(exception::class.java.name)
                 append(":")
                 append(message)
                 appendln(message)
-                stackTrace.forEach {element ->
+                stackTrace.forEach { element ->
                     appendln("\tat $element")
                 }
                 suppressed.forEachIndexed { index, element ->
-                    if (index==0)append("Suppressed: ")
+                    if (index == 0) append("Suppressed: ")
                     append(preErr(element))
                 }
                 cause.isNotNull {
@@ -81,41 +80,44 @@ private fun <T:Throwable> preErr(exception: T):String{
     }
 }
 
-fun <T:Exception> T.err(tag: String=this::class.java.simpleName,config: LoggerConfig = GlobalLoggerConfig):T{
-    val text = preLog(tag,config)
+fun <T : Exception> T.err(tag: String = this::class.java.simpleName, config: LoggerConfig = GlobalLoggerConfig): T {
+    val text = preLog(tag, config)
     val err = preErr(this)
     systemErrPrint("$text $err")
-    Logger.sendEvent(Logger.Source.ERR,err)
+    Logger.sendEvent(Logger.Source.ERR, err)
     return this
 }
 
-object Logger{
-    enum class Source{
-        STD,ERR
+object Logger {
+    enum class Source {
+        STD, ERR
     }
-    private val listeners = ArrayList<BlockWithTwoArgs<Source,String>>()
-    fun listen(listener:BlockWithTwoArgs<Source,String>):Int{
+
+    private val listeners = ArrayList<(Source, String) -> Unit>()
+    fun listen(listener: (Source, String) -> Unit): Int {
         synchronized(listeners) {
             listeners.add(listener)
             return listener.hashCode()
         }
     }
-    fun unlisten(id:Int){
-        synchronized(listeners){
+
+    fun cancel(id: Int) {
+        synchronized(listeners) {
             val iterator = listeners.listIterator()
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 val next = iterator.next()
-                if (next.hashCode() == id){
+                if (next.hashCode() == id) {
                     iterator.remove()
                     return
                 }
             }
         }
     }
-    internal fun sendEvent(src:Source,log:String){
+
+    internal fun sendEvent(src: Source, log: String) {
         listeners.forEach {
-            catch(tag = "Log listener"){
-                it.invoke(src,log)
+            catch(tag = "Log listener") {
+                it.invoke(src, log)
             }
         }
     }

@@ -1,10 +1,9 @@
 package io.github.mslxl.uitlities.log
 
-import io.github.mslxl.uitlities.BlockWithArgs
 import java.io.PrintStream
 import java.util.*
 
-internal class LoggerStream(output: PrintStream,val print:BlockWithArgs<Any?>,val println:BlockWithArgs<Any?>) : PrintStream(output) {
+internal class LoggerStream(output: PrintStream, val print: (Any?) -> Unit, val println: (Any?) -> Unit) : PrintStream(output) {
     override fun print(p0: Boolean) {
         print.invoke(p0)
     }
@@ -30,7 +29,7 @@ internal class LoggerStream(output: PrintStream,val print:BlockWithArgs<Any?>,va
     }
 
     override fun print(p0: CharArray) {
-        print.invoke(p0)
+        print.invoke(String(p0))
     }
 
     override fun print(p0: String?) {
@@ -65,8 +64,8 @@ internal class LoggerStream(output: PrintStream,val print:BlockWithArgs<Any?>,va
         println.invoke(p0)
     }
 
-    override fun println(p0: CharArray?) {
-        println.invoke(p0)
+    override fun println(p0: CharArray) {
+        println.invoke(String(p0))
     }
 
     override fun println(p0: String?) {
