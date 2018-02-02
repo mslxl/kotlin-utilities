@@ -1,20 +1,10 @@
 package io.github.mslxl.uitlities.io
 
 import io.github.mslxl.uitlities.log.log
-import org.junit.AfterClass
 import org.junit.Test
-import java.io.File
 import java.net.URL
 
 class ResourceTest {
-    companion object {
-        @AfterClass
-        @JvmStatic
-        fun removeAll() {
-            log("Resource Test", "Remove `.resources` dir")
-            File(".resources").deleteRecursively()
-        }
-    }
 
     @Test
     fun url() {

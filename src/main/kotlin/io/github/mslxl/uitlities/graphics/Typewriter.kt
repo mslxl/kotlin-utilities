@@ -2,106 +2,155 @@ package io.github.mslxl.uitlities.graphics
 
 import io.github.mslxl.uitlities.log.log
 import io.github.mslxl.uitlities.logic.isTrue
-import java.awt.*
+import java.awt.Color
+import java.awt.Font
+import java.awt.image.BufferedImage
 
 
 class Typewriter {
 
     private lateinit var paper: Paper
-    private var graphics: Graphics? = null
-        set(value) {
-            if (value == null) throw NullPointerException()
-            (value as? Graphics2D)?.run {
-                setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
-                setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_DEFAULT)
-            }
-            value.color = this@Typewriter.fontColor
-            field = value
-        }
-    val margin = Margin()
-    var font = Font.getFont(Font.SANS_SERIF)
-    var fontColor = Color.BLACK
-        set(value) {
-            field = value
-            graphics?.color = value
-        }
-    private var first = true
+    val space = Space()
+    var font = Font.getFont(Font.MONOSPACED)
+    var fontColor = Color.BLACK!!
+    var paperSupport: PaperSupportDevice = PaperSupportDevice {}
+    private var firstPaper = true
+    private var firstLine = true
     private val position = Position()
-
-
+    private var needNewLine = false
+    private var lastCharHeight = 0
     private fun nextPaper(out: Boolean = true) {
         out.isTrue {
-            output.invoke(paper)
+            paperSupport.output.invoke(paper)
         }
-        paper = feed.invoke()
-        graphics = paper.graphics
-        position.reset()
+        paper = paperSupport.feed.invoke()
+        restPos()
+        firstLine = true
     }
 
+    @JvmOverloads
     fun type(txt: String, size: Float = -1F) {
         txt.chars().forEach { typeChar(it.toChar(), size) }
     }
 
-    fun typeChar(char: Char, size: Float = -1F) {
-        first.isTrue {
-            nextPaper(false)
-            first = false
+    private fun moveDown(height: Int) {
+        resetPosX()
+        position.y += (height + space.lineSpacing)
+    }
+
+    private fun resetPosX() {
+        position.x = paper.margin.left
+    }
+
+    private fun resetPosY() {
+        position.y = paper.margin.top
+    }
+
+    private fun restPos() {
+        resetPosX()
+        resetPosY()
+    }
+
+    private fun movePosition(width: Int, height: Int) {
+        if (position.x >= paper.width - paper.margin.right || needNewLine) {
+            // Next line?
+            moveDown(height)
+            needNewLine = false
         }
-        graphics!!.let {
 
-            it.font = if (size < 0) this@Typewriter.font else this@Typewriter.font.deriveFont(size)
+        if (position.y >= paper.height - paper.margin.bottom) {
+            // Next page ?
+            nextPaper()
+        }
 
-            val metrics = it.fontMetrics
-            val charWidth = metrics.charWidth(char)
-            if (position.x >= paper.width - margin.right) {
-                // Next line?
-                position.x = margin.left
-                position.y += metrics.height
-            }
+        if (position.x == 0 && position.y == 0) {
+            // Skip  margin
+            resetPosX()
+            position.y = paper.margin.top + height
+        }
+        lastCharHeight = height
+    }
 
-            if (position.y >= paper.height - margin.bottom) {
-                // Next page ?
-                position.reset()
-                nextPaper()
-            }
-
-            if (position.x == 0 && position.y == 0) {
-                // Skip  margin
-                position.x = margin.left
-                position.y = margin.top + metrics.height
-            }
-
-            it.drawString(char.toString(), position.x, position.y)
-            char.log("Type")
-            // Next char
-            position.x += charWidth
+    private fun checkFirstPaper() {
+        firstPaper.isTrue {
+            nextPaper(false)
+            firstPaper = false
         }
     }
 
+    private fun checkFirstLine(fontHeight: Int) {
+        firstLine.isTrue {
+            position.x += fontHeight
+            firstLine = false
+        }
+    }
+
+    @JvmOverloads
+    fun typeChar(char: Char, size: Float = -1F) {
+        checkFirstPaper()
+
+        paper.graphics.let {
+
+            it.font = if (size < 0) this@Typewriter.font else this@Typewriter.font.deriveFont(size)
+            it.color = fontColor
+            val metrics = it.fontMetrics
+            val charWidth = metrics.charWidth(char)
+
+            checkFirstLine(metrics.height)
+            movePosition(charWidth, metrics.height)
+
+            it.drawString(char.toString(), position.x, position.y)
+            char.log("Type ${position.x} X ${position.y}")
+            // Next char
+            position.x += (charWidth + space.wordSpacing)
+        }
+    }
+
+    @JvmOverloads
+    fun insertImage(image: BufferedImage, zoom: Boolean = true) {
+        checkFirstPaper()
+        var targetWidth = image.width
+        var targetHeight = image.height
+        var targetImage = image
+        if (zoom) {
+            val paperHeight = paper.height - position.y - paper.margin.bottom
+            val paperWidth = paper.width - paper.margin.left - paper.margin.right
+
+            if (paperHeight < targetHeight || paperWidth < targetWidth) {
+                val heightDifference = targetHeight - paperHeight
+                val widthDifference = targetWidth - paperWidth
+                val proportion = if (heightDifference > widthDifference) {
+                    // According height
+                    paperHeight.toFloat() / targetHeight
+                } else {
+                    // According width
+                    paperWidth.toFloat() / targetWidth
+                }
+                targetHeight = (targetHeight * proportion).toInt()
+                targetWidth = (targetWidth * proportion).toInt()
+                targetImage = targetImage.scale(targetWidth, targetHeight)
+            }
+        }
+        moveDown(lastCharHeight)
+        paper.graphics.drawImage(targetImage, position.x, position.y, null)
+        moveDown(targetHeight)
+        needNewLine = true
+    }
+
+    /**
+     * 结束当前页并输出
+     */
     fun flush() {
         nextPaper(true)
     }
 
-    var feed: () -> Paper = {
-        error("No feed")
-    }
-    var output: (Paper) -> Unit = {}
-
-    class Margin {
-        var top = 0
-        var bottom = 0
-        var left = 0
-        var right = 0
+    class Space {
+        var wordSpacing = 0
+        var lineSpacing = 0
     }
 
     private class Position {
         var x = 0
         var y = 0
-
-        fun reset() {
-            x = 0
-            y = 0
-        }
     }
 }

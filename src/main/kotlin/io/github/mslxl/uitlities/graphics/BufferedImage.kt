@@ -1,7 +1,5 @@
 package io.github.mslxl.uitlities.graphics
 
-import java.awt.geom.AffineTransform
-import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 
 
@@ -15,10 +13,10 @@ fun BufferedImage.cut(x: Int, y: Int, toX: Int, toY: Int): BufferedImage {
     return result
 }
 
-fun BufferedImage.scale(percentage: Double) = scale(this.width * percentage, this.height * percentage)
+fun BufferedImage.scale(percentage: Float) = scale((this.width * percentage).toInt(), (this.height * percentage).toInt())
 
-fun BufferedImage.scale(toWidth: Double, toHeight: Double): BufferedImage {
-    val ato = AffineTransformOp(AffineTransform.getScaleInstance(toWidth, toHeight), null)
-    val result = ato.filter(this, null)
-    return result as BufferedImage
+fun BufferedImage.scale(targetWidth: Int, targetHeight: Int): BufferedImage {
+    val result = BufferedImage(targetWidth, targetHeight, type)
+    result.graphics.drawImage(getScaledInstance(targetWidth, targetHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null)
+    return result
 }
