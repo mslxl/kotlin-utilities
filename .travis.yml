@@ -27,3 +27,4 @@ deploy:
   skip_cleanup: true
   on:
     repo: mslxl/kotlin-utilities
+    tags: true

@@ -10,4 +10,9 @@ class StringTest {
         arrayOf("h", "e", "l", "l", "o").mkString("[", ",", "]") shouldBe "[h,e,l,l,o]"
         arrayOf("h", "e", "l", "l", "o").mkString(",") shouldBe "h,e,l,l,o"
     }
+
+    @Test
+    fun format() {
+        "hello {{name}},are u {{quest}},bye {{name}}".format("name" to "van", "quest" to "ok") shouldBe "hello van,are u ok,bye van"
+    }
 }
