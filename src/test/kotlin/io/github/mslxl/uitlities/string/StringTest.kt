@@ -12,7 +12,7 @@ class StringTest {
     }
 
     @Test
-    fun format() {
-        "hello {{name}},are u {{quest}},bye {{name}}".format("name" to "van", "quest" to "ok") shouldBe "hello van,are u ok,bye van"
+    fun formatByPair() {
+        "hello {{name}},are u {{quest}},bye {{name}}".formatByPair("name" to "van", "quest" to "ok") shouldBe "hello van,are u ok,bye van"
     }
 }

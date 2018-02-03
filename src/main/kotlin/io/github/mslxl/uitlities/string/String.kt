@@ -38,7 +38,7 @@ fun String.htmlTextFormat(): String {
     return text
 }
 
-fun String.format(vararg pair: Pair<String, Any>): String {
+fun String.formatByPair(vararg pair: Pair<String, Any>): String {
     var str = this
     pair.forEach {
         str = str.replace("\\{\\{${it.first}}}".toRegex(), it.second.toString())
