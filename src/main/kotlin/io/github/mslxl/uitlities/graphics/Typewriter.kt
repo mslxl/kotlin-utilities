@@ -22,7 +22,7 @@ class Typewriter {
     private var lastCharHeight = 0
     private var pageNumber = Counter()
 
-    val printPageNum = pageNumber.value
+    val printPageNum get() = pageNumber.value
 
     private fun nextPaper(out: Boolean = true) {
         out.isTrue {
@@ -58,6 +58,7 @@ class Typewriter {
         resetPosY()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun movePosition(width: Int, height: Int) {
         if (position.x >= paper.width - paper.margin.right || needNewLine) {
             // Next line?
@@ -106,19 +107,22 @@ class Typewriter {
             checkFirstLine(metrics.height)
             movePosition(charWidth, metrics.height)
 
-            it.drawString(char.toString(), position.x, position.y)
+            if (char == '\n') {
+                nextLine()
+            } else {
+                it.drawString(char.toString(), position.x, position.y)
+            }
             char.log("Type ${position.x} X ${position.y}")
             // Next char
             position.x += (charWidth + space.wordSpacing)
         }
     }
 
-    fun nextLine(size: Float = -1F) {
-        paper.graphics.let {
-            font = if (size < 0) this@Typewriter.font else this@Typewriter.font.deriveFont(size)
-            it.color = fontColor
-            moveDown(it.fontMetrics.height)
-        }
+    /*
+    下一字符前换行
+     */
+    fun nextLine() {
+        needNewLine = true
     }
 
     @JvmOverloads

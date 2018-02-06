@@ -2,6 +2,8 @@ package io.github.mslxl.uitlities.graphics
 
 import io.github.mslxl.uitlities.catch
 import io.github.mslxl.uitlities.io.Resource
+import io.github.mslxl.uitlities.log.GlobalLoggerConfig
+import io.github.mslxl.uitlities.num.rem
 import org.junit.Test
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -14,6 +16,7 @@ class TypewriterTest {
 
     @Test
     fun type() {
+        GlobalLoggerConfig.escapeNewlineSymbol = true
         val typewriter = Typewriter()
         var page = 1
         typewriter.apply {
@@ -48,6 +51,9 @@ class TypewriterTest {
             val txt = buildString {
                 repeat(5 * 500) {
                     append((it + '!'.toInt()).toChar())
+                    20 % {
+                        append('\n')
+                    }
                     append(" ")
                 }
             }
@@ -57,5 +63,6 @@ class TypewriterTest {
             typewriter.flush()
 
         }
+        GlobalLoggerConfig.escapeNewlineSymbol = false
     }
 }

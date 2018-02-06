@@ -40,7 +40,10 @@ fun <T : Any?> T.log(tag: String = "Log", config: LoggerConfig = GlobalLoggerCon
 }
 
 fun log(tag: String = "Log", vararg msg: Any?, config: LoggerConfig = GlobalLoggerConfig) {
-    val text = msg.mkString(" ")
+    var text = msg.mkString(" ")
+    if (config.escapeNewlineSymbol) {
+        text = text.replace("\\s".toRegex(), "\\\\n")
+    }
     systemPrintln("${preLog(tag, config)} $text")
     Logger.sendEvent(Logger.Source.STD, text)
 }

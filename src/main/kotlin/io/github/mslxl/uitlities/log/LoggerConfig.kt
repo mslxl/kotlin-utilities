@@ -8,4 +8,5 @@ open class LoggerConfig {
     var startTime = false
     var timeFormat: DateFormat = SimpleDateFormat("MM-dd HH:mm:ss")
     var tag = true
+    var escapeNewlineSymbol = false
 }
