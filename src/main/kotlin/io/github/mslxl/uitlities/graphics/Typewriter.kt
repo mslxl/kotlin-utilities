@@ -2,6 +2,7 @@ package io.github.mslxl.uitlities.graphics
 
 import io.github.mslxl.uitlities.log.log
 import io.github.mslxl.uitlities.logic.isTrue
+import io.github.mslxl.uitlities.num.Counter
 import java.awt.Color
 import java.awt.Font
 import java.awt.image.BufferedImage
@@ -19,6 +20,10 @@ class Typewriter {
     private val position = Position()
     private var needNewLine = false
     private var lastCharHeight = 0
+    private var pageNumber = Counter()
+
+    val printPageNum = pageNumber.value
+
     private fun nextPaper(out: Boolean = true) {
         out.isTrue {
             paperSupport.output.invoke(paper)
@@ -26,6 +31,8 @@ class Typewriter {
         paper = paperSupport.feed.invoke()
         restPos()
         firstLine = true
+        pageNumber.inc()
+
     }
 
     @JvmOverloads
@@ -103,6 +110,14 @@ class Typewriter {
             char.log("Type ${position.x} X ${position.y}")
             // Next char
             position.x += (charWidth + space.wordSpacing)
+        }
+    }
+
+    fun nextLine(size: Float = -1F) {
+        paper.graphics.let {
+            font = if (size < 0) this@Typewriter.font else this@Typewriter.font.deriveFont(size)
+            it.color = fontColor
+            moveDown(it.fontMetrics.height)
         }
     }
 
