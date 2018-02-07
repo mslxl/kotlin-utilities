@@ -1,193 +1,209 @@
 package io.github.mslxl.uitlities.graphics
 
 import io.github.mslxl.uitlities.log.log
-import io.github.mslxl.uitlities.logic.isTrue
 import io.github.mslxl.uitlities.num.Counter
 import java.awt.Color
 import java.awt.Font
 import java.awt.image.BufferedImage
 
 
-class Typewriter {
+open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportDevice<PaperType>) {
 
-    private lateinit var paper: Paper
-    val space = Space()
-    var font = Font.getFont(Font.MONOSPACED)
-    var fontColor = Color.BLACK!!
-    var paperSupport: PaperSupportDevice = PaperSupportDevice {}
-    private var firstPaper = true
-    private var firstLine = true
-    private val position = Position()
-    private var needNewLineNum = 0
+    /**
+     * 当前页
+     */
+    protected lateinit var paper: PaperType
+
+    /**
+     * 当前位置
+     */
+    protected var posX = 0
+    val positionX get() = posX
+    protected var posY = 0
+    val positionY get() = posY
+    /**
+     * 当前行可用 横向像素
+     */
+    val availableWidth get() = paper.width - paper.margin.right - posX
+    /**
+     * 当前页可用 纵向像素
+     */
+    val availableHeight get() = paper.height - paper.margin.bottom - posY
+
+
+    /**
+     *  间距
+     */
+    var fontSpace = 2
+    var lineSpace = 5
+
+    /**
+     * 下次位置变化时 下移行数
+     */
+    private var needNextLineNumber = Counter()
+
+    var font = Font(Font.MONOSPACED, Font.PLAIN, 12)
+    var color = Color.BLACK!!
+
+    private val currentPageNumberCounter = Counter(0)
+    val currentPageNumber get() = currentPageNumberCounter.count
+
+    /**
+     * 上一字符的高度
+     */
     private var lastCharHeight = 0
-    private var pageNumber = Counter()
 
-    val printPageNum get() = pageNumber.value
-
-    private fun nextPaper(out: Boolean = true) {
-        out.isTrue {
-            paperSupport.output.invoke(paper)
-        }
-        paper = paperSupport.feed.invoke()
-        restPos()
-        firstLine = true
-        pageNumber.inc()
-
-    }
-
-    @JvmOverloads
-    fun type(txt: String, size: Float = -1F) {
-        txt.chars().forEach { typeChar(it.toChar(), size) }
-    }
-
-    private fun moveDown(height: Int) {
+    /**
+     * 重置位置到左上角
+     */
+    private fun resetPos() {
         resetPosX()
-        position.y += (height + space.lineSpacing)
+        resetPosY()
+        needNextLineNumber.inc()
     }
 
     private fun resetPosX() {
-        position.x = paper.margin.left
+        posX = paper.margin.left
     }
 
     private fun resetPosY() {
-        position.y = paper.margin.top
+        posY = paper.margin.top
     }
 
-    private fun restPos() {
-        resetPosX()
-        resetPosY()
+    /**
+     * 进纸 （ 换新纸
+     */
+    private fun feedPaper() {
+        paper = paperSupport.feed()
+        needNextLineNumber = Counter()
+        resetPos()
+        currentPageNumberCounter.inc()
+        lastCharHeight = 0
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    private fun movePosition(width: Int, height: Int) {
-        if (position.x >= paper.width - paper.margin.right || needNewLineNum > 0) {
-            // Next line?
-            while (needNewLineNum != 0) {
-                moveDown(height)
-                needNewLineNum--
+    /**
+     * 根据大小和样式获取字体对象
+     */
+    private fun getFont(size: Float = -1F, style: Int = -1): Font {
+        var ft = font
+        ft = if (size < 0) ft else ft.deriveFont(size)
+        ft = if (style < 0) ft else ft.deriveFont(size)
+        return ft
+    }
+
+    /**
+     * 检查并移动位置( 仅能操作单字符，否则会计算错误
+     */
+    private fun checkPos(width: Int, height: Int) {
+        while (needNextLineNumber.count > 0) {
+            nextLineImmediately(height)
+            needNextLineNumber.dec()
+        }
+        if (width < availableWidth) {
+            moveRight(width)
+        } else {
+            if (height < availableHeight) {
+                nextLineImmediately(height)
+            } else {
+                flush()
             }
         }
+    }
 
-        if (position.y >= paper.height - paper.margin.bottom) {
-            // Next page ?
-            nextPaper()
-        }
+    /**
+     * 下一字符时换一行 ，高度为下一字符高度
+     */
+    fun nextLine() {
+        needNextLineNumber.inc()
+    }
 
-        if (position.x == 0 && position.y == 0) {
-            // Skip  margin
-            resetPosX()
-            position.y = paper.margin.top + height
-        }
+    /**
+     * 立即换一行 默认为下一字符的高度
+     */
+    fun nextLineImmediately(height: Int = lastCharHeight) {
+        posY += (height + lineSpace)
+        resetPosX()
         lastCharHeight = height
     }
 
-    private fun checkFirstPaper() {
-        firstPaper.isTrue {
-            nextPaper(false)
-            firstPaper = false
-        }
+    /**
+     * 立即右移
+     */
+    fun moveRight(width: Int) {
+        posX += (width + fontSpace)
     }
 
-    private fun checkFirstLine(fontHeight: Int) {
-        firstLine.isTrue {
-            position.x += fontHeight
-            firstLine = false
-        }
-    }
-
+    /**
+     * 打印 Char
+     */
     @JvmOverloads
-    fun typeChar(char: Char, size: Float = -1F) {
-        checkFirstPaper()
+    fun print(char: Char, size: Float = -1F, style: Int = -1) {
+        if (char == '\n') {
+            nextLine()
+            return
+        }
 
         paper.graphics.let {
-
-            it.font = if (size < 0) this@Typewriter.font else this@Typewriter.font.deriveFont(size)
-            it.color = fontColor
+            it.font = getFont(size, style)
+            it.color = color
             val metrics = it.fontMetrics
             val charWidth = metrics.charWidth(char)
+            val charHeight = metrics.height
+            checkPos(charWidth, charHeight)
+            it.drawString(char.toString(), posX, posY)
 
-            checkFirstLine(metrics.height)
-            movePosition(charWidth, metrics.height)
+        }
 
-            if (char == '\n') {
-                nextLine()
-            } else {
-                it.drawString(char.toString(), position.x, position.y)
-            }
-            char.log("Type ${position.x} X ${position.y}")
-            // Next char
-            position.x += (charWidth + space.wordSpacing)
+    }
+
+    @JvmOverloads
+    fun print(text: String, size: Float = -1F, style: Int = -1) {
+        text.forEach {
+            print(it, size, style)
         }
     }
 
     @JvmOverloads
-    fun typeFromLeft(text: String, filler: Char = ' ', size: Float = -1F) {
-        checkFirstPaper()
-        paper.graphics.let {
-            it.font = if (size < 0) this@Typewriter.font else this@Typewriter.font.deriveFont(size)
-            it.color = fontColor
-            val metrics = it.fontMetrics
-            val charWidth = metrics.stringWidth(text)
-
-            do {
-                typeChar(filler, size)
-            } while (position.x < paper.width - paper.margin.left - charWidth - (charWidth / text.length))
-            type(text, size)
-        }
-    }
-
-    /*
-    下一字符前换行
-     */
-    fun nextLine() {
-        needNewLineNum++
-    }
+    fun println(text: String = "", size: Float = -1F, style: Int = -1) = print(text + "\n", size, style)
 
     @JvmOverloads
+
     fun insertImage(image: BufferedImage, zoom: Boolean = true) {
-        checkFirstPaper()
         var targetWidth = image.width
         var targetHeight = image.height
         var targetImage = image
         if (zoom) {
-            val paperHeight = paper.height - position.y - paper.margin.bottom
-            val paperWidth = paper.width - paper.margin.left - paper.margin.right
-
-            if (paperHeight < targetHeight || paperWidth < targetWidth) {
-                val heightDifference = targetHeight - paperHeight
-                val widthDifference = targetWidth - paperWidth
+            if (availableHeight < targetHeight || availableWidth < targetWidth) {
+                val heightDifference = targetHeight - availableHeight
+                val widthDifference = targetWidth - availableWidth
                 val proportion = if (heightDifference > widthDifference) {
                     // According height
-                    paperHeight.toFloat() / targetHeight
+                    availableHeight.toFloat() / targetHeight
                 } else {
                     // According width
-                    paperWidth.toFloat() / targetWidth
+                    availableWidth.toFloat() / targetWidth
                 }
                 targetHeight = (targetHeight * proportion).toInt()
                 targetWidth = (targetWidth * proportion).toInt()
                 targetImage = targetImage.scale(targetWidth, targetHeight)
             }
         }
-        moveDown(lastCharHeight)
-        paper.graphics.drawImage(targetImage, position.x, position.y, null)
-        moveDown(targetHeight)
+        nextLineImmediately()
+        "$targetWidth X $targetHeight".log()
+        paper.graphics.drawImage(targetImage, posX, posY, null)
+        posY += targetHeight
         nextLine()
     }
 
     /**
-     * 结束当前页并输出
+     * 直接输出当前页
      */
     fun flush() {
-        nextPaper(true)
+        paperSupport.output(paper)
+        feedPaper()
     }
 
-    class Space {
-        var wordSpacing = 0
-        var lineSpacing = 0
-    }
-
-    private class Position {
-        var x = 0
-        var y = 0
+    init {
+        feedPaper()
     }
 }

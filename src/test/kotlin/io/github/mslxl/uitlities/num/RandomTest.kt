@@ -16,7 +16,7 @@ class RandomTest {
         }
         "The number of result:${map.size}".log("RandomTest")
         map.forEach { t, u ->
-            "There are ${u.value} of $t".log("RandomTest")
+            "There are ${u.count} of $t".log("RandomTest")
         }
 
     }

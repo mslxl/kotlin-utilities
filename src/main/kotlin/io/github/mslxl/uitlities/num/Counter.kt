@@ -1,10 +1,17 @@
 package io.github.mslxl.uitlities.num
 
 class Counter(initValue: Int = 0) {
-    var value = initValue
+    private var value = initValue
     fun inc(): Int {
-        value++
-        return value
+        return ++value
     }
 
+    fun dec(): Int {
+        return --value
+    }
+
+    val count get() = value
+    override fun toString(): String {
+        return count.toString()
+    }
 }

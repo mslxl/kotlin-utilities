@@ -1,11 +1,11 @@
 package io.github.mslxl.uitlities.graphics
 
-import io.github.mslxl.uitlities.catch
 import io.github.mslxl.uitlities.io.Resource
-import io.github.mslxl.uitlities.log.GlobalLoggerConfig
-import io.github.mslxl.uitlities.num.rem
+import io.github.mslxl.uitlities.logic.whether
+import io.github.mslxl.uitlities.num.Counter
+import io.github.mslxl.uitlities.string.times
 import org.junit.Test
-import java.awt.Color
+import java.awt.Font
 import java.awt.image.BufferedImage
 import java.io.File
 import java.net.URL
@@ -16,56 +16,37 @@ class TypewriterTest {
 
     @Test
     fun type() {
-        GlobalLoggerConfig.escapeNewlineSymbol = true
-        val typewriter = Typewriter()
-        var page = 1
-        typewriter.apply {
-            paperSupport = PaperSupportDevice {
-                output { paper ->
-                    catch {
-                        File("/tmp/typewriter_$page.png").outputStream().use {
-                            ImageIO.write(paper.data as BufferedImage, "PNG", it)
-                        }
-                    }
-                    page++
-                }
-                feed {
-                    BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR).let {
-                        Paper(it, it).apply {
-                            margin.let {
-                                it.top = 10
-                                it.bottom = 10
-                                it.left = 15
-                                it.right = 15
-                            }
-                        }
-                    }
+        val device = object : PaperSupportDevice<BufferedImagePaper> {
+            override fun feed(): BufferedImagePaper {
+                return BufferedImagePaper(BufferedImage(2480, 3580, BufferedImage.TYPE_4BYTE_ABGR)).apply {
+                    margin.top = 40
+                    margin.bottom = 100
+                    margin.right = 30
+                    margin.left = 30
                 }
             }
-            fontColor = Color.BLACK
+
+            val dir = File("out/tmp").whether { exists() }.isFalse { mkdirs() }.source
+            val count = Counter(0)
+            override fun output(paper: BufferedImagePaper) {
+                File(dir, count.inc().toString() + "-${paper.graphics.hashCode()}.png").apply {
+                    if (exists()) delete()
+                }.outputStream().use {
+                    ImageIO.write(paper.bufferedImage, "PNG", it)
+                }
+            }
         }
-
-
-        Resource(URL("https://www.baidu.com/img/bd_logo1.png")).inputStream {
-            val image = ImageIO.read(it)
-            val txt = buildString {
-                repeat(5 * 500) {
-                    append((it + '!'.toInt()).toChar())
-                    20 % {
-                        append('\n')
-                    }
-                    append(" ")
-                }
-            }
+        Resource(URL("https://www.baidu.com/img/bd_logo1.png")).inputStream { imageStream ->
+            val image = ImageIO.read(imageStream).scale(0.5F)
+            val typewriter = Typewriter(device)
+            typewriter.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
             typewriter.insertImage(image)
-            typewriter.type(txt)
+            typewriter.println("hello,world" * 100 * 50, 10F)
             typewriter.insertImage(image)
-            typewriter.nextLine()
-            typewriter.type("Test ")
-            typewriter.typeFromLeft(" P30", '-')
+            typewriter.println("hello,world" * 100 * 50, 10F)
+            typewriter.insertImage(image)
             typewriter.flush()
-
         }
-        GlobalLoggerConfig.escapeNewlineSymbol = false
+
     }
 }
