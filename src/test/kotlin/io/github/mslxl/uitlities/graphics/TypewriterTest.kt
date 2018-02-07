@@ -60,6 +60,9 @@ class TypewriterTest {
             typewriter.insertImage(image)
             typewriter.type(txt)
             typewriter.insertImage(image)
+            typewriter.nextLine()
+            typewriter.type("Test ")
+            typewriter.typeFromLeft(" P30", '-')
             typewriter.flush()
 
         }

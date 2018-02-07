@@ -120,6 +120,22 @@ class Typewriter {
         }
     }
 
+    @JvmOverloads
+    fun typeFromLeft(text: String, filler: Char = ' ', size: Float = -1F) {
+        checkFirstPaper()
+        paper.graphics.let {
+            it.font = if (size < 0) this@Typewriter.font else this@Typewriter.font.deriveFont(size)
+            it.color = fontColor
+            val metrics = it.fontMetrics
+            val charWidth = metrics.stringWidth(text)
+
+            do {
+                typeChar(filler, size)
+            } while (position.x < paper.width - paper.margin.left - charWidth - (charWidth / text.length))
+            type(text, size)
+        }
+    }
+
     /*
     下一字符前换行
      */
