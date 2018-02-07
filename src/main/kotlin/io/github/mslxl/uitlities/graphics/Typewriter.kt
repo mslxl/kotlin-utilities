@@ -18,7 +18,7 @@ class Typewriter {
     private var firstPaper = true
     private var firstLine = true
     private val position = Position()
-    private var needNewLine = false
+    private var needNewLineNum = 0
     private var lastCharHeight = 0
     private var pageNumber = Counter()
 
@@ -60,10 +60,12 @@ class Typewriter {
 
     @Suppress("UNUSED_PARAMETER")
     private fun movePosition(width: Int, height: Int) {
-        if (position.x >= paper.width - paper.margin.right || needNewLine) {
+        if (position.x >= paper.width - paper.margin.right || needNewLineNum > 0) {
             // Next line?
-            moveDown(height)
-            needNewLine = false
+            while (needNewLineNum != 0) {
+                moveDown(height)
+                needNewLineNum--
+            }
         }
 
         if (position.y >= paper.height - paper.margin.bottom) {
@@ -122,7 +124,7 @@ class Typewriter {
     下一字符前换行
      */
     fun nextLine() {
-        needNewLine = true
+        needNewLineNum++
     }
 
     @JvmOverloads
@@ -153,7 +155,7 @@ class Typewriter {
         moveDown(lastCharHeight)
         paper.graphics.drawImage(targetImage, position.x, position.y, null)
         moveDown(targetHeight)
-        needNewLine = true
+        nextLine()
     }
 
     /**
