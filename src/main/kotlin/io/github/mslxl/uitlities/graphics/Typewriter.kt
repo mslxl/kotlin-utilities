@@ -64,6 +64,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
 
     private fun resetPosX() {
         posX = paper.margin.left
+        lastCharWidth = 0
     }
 
     private fun resetPosY() {

@@ -41,9 +41,8 @@ class TypewriterTest {
             val typewriter = Typewriter(device)
             typewriter.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
             typewriter.insertImage(image)
-            typewriter.println("hello,world" * 100 * 50, 10F)
+            typewriter.println("hello,world\n" * 50, 10F)
             typewriter.insertImage(image)
-            typewriter.println("hello,world" * 100 * 50, 10F)
             typewriter.insertImage(image)
             typewriter.flush()
         }
