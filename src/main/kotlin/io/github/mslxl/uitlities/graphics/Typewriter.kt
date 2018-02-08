@@ -52,7 +52,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
      * 上一字符的高度
      */
     private var lastCharHeight = 0
-
+    private var lastCharWidth = 0
     /**
      * 重置位置到左上角
      */
@@ -68,6 +68,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
 
     private fun resetPosY() {
         posY = paper.margin.top
+        lastCharWidth = 0
     }
 
     /**
@@ -99,8 +100,9 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
             nextLineImmediately(height)
             needNextLineNumber.dec()
         }
-        if (width < availableWidth) {
-            moveRight(width)
+        if (lastCharWidth < availableWidth) {
+            moveRight(lastCharWidth)
+            lastCharWidth = width
         } else {
             if (height < availableHeight) {
                 nextLineImmediately(height)
@@ -200,6 +202,12 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
      */
     fun flush() {
         paperSupport.output(paper)
+        feedPaper()
+    }
+
+    fun reboot() {
+        needNextLineNumber.default()
+        currentPageNumberCounter.default()
         feedPaper()
     }
 
