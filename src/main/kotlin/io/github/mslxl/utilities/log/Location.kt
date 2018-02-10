@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.mslxl.utilities.log
 
 @JvmOverloads
@@ -17,7 +19,7 @@ fun whoCalledMe() = codeLocation(1)
 fun whoCalledMyParent() = codeLocation(2)
 fun whoCalledMyGrandparent() = codeLocation(3)
 
-@Suppress("MemberVisibilityCanBePrivate")
+@Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
 class CodeLocation(val className: String,
                    val fileName: String,
                    val methodName: String,
