@@ -106,17 +106,20 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
      */
     protected fun checkPos(width: Int, height: Int) {
         while (needNextLineNumber.count > 0) {
-            nextLineImmediately(height)
+            nextLineImmediately(lastCharHeight)
+            // 覆盖原本用来别处使用时储存的 lastCharHeight
+            lastCharHeight = height
             needNextLineNumber.dec()
         }
         if (lastCharWidth > availableWidth) {
-            if (height < availableHeight) {
-                nextLineImmediately(height)
-            } else {
-                flush()
-            }
+            nextLineImmediately(height)
         }
+        if (height > availableHeight) {
+            flush()
+        }
+
         moveRight(lastCharWidth)
+
         if (width > 0) {
             lastCharWidth = width
         }
@@ -137,6 +140,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
         posY += (height + lineSpace)
         resetPosX()
         lastCharHeight = height
+        lastCharWidth = 0
     }
 
     /**
@@ -206,7 +210,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
             }
         }
         checkPos(0, targetHeight)
-        paper.graphics.drawImage(targetImage, posX, posY - targetHeight - lineSpace, null)
+        paper.graphics.drawImage(targetImage, posX, posY, null)
         nextLine()
     }
 
@@ -225,9 +229,6 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
         paper.graphics.let {
             it.font = getFont(size, style)
             it.color = color
-            if (availableWidth < lineWidth) {
-                nextLine()
-            }
             val metrics = it.fontMetrics
             checkPos(0, metrics.height)
             print(left, size, style)

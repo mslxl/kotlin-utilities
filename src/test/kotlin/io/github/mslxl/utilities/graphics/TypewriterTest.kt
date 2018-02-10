@@ -29,7 +29,7 @@ class TypewriterTest {
             val dir = File("out/tmp").whether { exists() }.isFalse { mkdirs() }.source
             val count = Counter(0)
             override fun output(paper: BufferedImagePaper) {
-                File(dir, count.inc().toString() + "-${paper.graphics.hashCode()}.png").apply {
+                File(dir, count.inc().toString() + ".png").apply {
                     if (exists()) delete()
                 }.outputStream().use {
                     ImageIO.write(paper.bufferedImage, "PNG", it)
@@ -41,30 +41,10 @@ class TypewriterTest {
 
         val typewriter = Typewriter(device)
         typewriter.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
-        typewriter.insertImage(bilibiliHeader)
+        typewriter.println("TOP")
+        repeat(30) {
+            typewriter.insertImage(bilibiliHeader)
+        }
         typewriter.print("hello,world\n" * 25, 10F)
         typewriter.print("1" * 500, 10F)
         typewriter.print("#" * 500, 10F)
@@ -72,13 +52,10 @@ class TypewriterTest {
         typewriter.insertImage(bilibiliHeader)
         typewriter.insertImage(bilibiliIcon)
         typewriter.print("#" * 500, 10F)
-        typewriter.fillLine("Title 1 ", '-', " P1")
-        typewriter.fillLine("Title 2 ", '<', " P2")
-        typewriter.fillLine("Title 3 ", '>', " P3")
-        typewriter.fillLine("Title 4 ", '*', " P4")
-        typewriter.fillLine("Title 5 ", '|', " P5")
-        typewriter.fillLine("^" * 20 + " ", '~', " " + "^" * 15)
-        typewriter.fillLine("#" * 20 + " ", '~', " " + "#" * 15)
+        repeat(90) {
+            typewriter.fillLine("Title $it ", '·', " P$it")
+        }
+
         typewriter.fillLine("哔哩哔哩 (゜-゜)つロ 干杯 ")
         typewriter.flush()
 

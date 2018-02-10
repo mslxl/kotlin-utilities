@@ -13,3 +13,4 @@ inline fun <R> catch(log: Boolean = true, tag: String = "Exception", block: () -
         null
     }
 }
+
