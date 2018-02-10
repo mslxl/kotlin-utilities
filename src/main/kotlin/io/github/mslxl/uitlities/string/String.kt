@@ -1,4 +1,8 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.github.mslxl.uitlities.string
+
+import java.net.URI
 
 fun Array<*>.mkString(prefix: String, divider: String, suffix: String): String {
     val str = reduce { acc, any ->
@@ -11,11 +15,11 @@ fun Array<*>.mkString(divider: String): String {
     return mkString("", divider, "")
 }
 
-operator fun StringBuilder.plusAssign(str: String) {
+inline operator fun StringBuilder.plusAssign(str: String) {
     append(str)
 }
 
-operator fun StringBuffer.plusAssign(str: String) {
+inline operator fun StringBuffer.plusAssign(str: String) {
     append(str)
 }
 
@@ -45,3 +49,6 @@ fun String.formatByPair(vararg pair: Pair<String, Any>): String {
     }
     return str
 }
+
+inline fun String.toUri() = URI.create(this)
+

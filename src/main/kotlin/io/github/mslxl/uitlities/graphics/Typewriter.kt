@@ -1,12 +1,12 @@
 package io.github.mslxl.uitlities.graphics
 
-import io.github.mslxl.uitlities.log.log
 import io.github.mslxl.uitlities.num.Counter
 import java.awt.Color
 import java.awt.Font
 import java.awt.image.BufferedImage
 
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportDevice<PaperType>) {
 
     /**
@@ -18,18 +18,24 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
      * 当前位置
      */
     protected var posX = 0
-    val positionX get() = posX
+    @Suppress("unused")
+    val positionX
+        get() = posX
     protected var posY = 0
-    val positionY get() = posY
+    @Suppress("unused")
+    val positionY
+        get() = posY
     /**
      * 当前行可用 横向像素
      */
-    val availableWidth get() = paper.width - paper.margin.right - posX
+    val availableWidth get() = lineWidth - posX
     /**
      * 当前页可用 纵向像素
      */
-    val availableHeight get() = paper.height - paper.margin.bottom - posY
+    val availableHeight get() = paperHeight - posY
 
+    val lineWidth get() = paper.width - paper.margin.right
+    val paperHeight get() = paper.height - paper.margin.bottom
 
     /**
      *  间距
@@ -46,7 +52,9 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
     var color = Color.BLACK!!
 
     private val currentPageNumberCounter = Counter(0)
-    val currentPageNumber get() = currentPageNumberCounter.count
+    @Suppress("unused")
+    val currentPageNumber
+        get() = currentPageNumberCounter.count
 
     /**
      * 上一字符的高度
@@ -86,7 +94,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
     /**
      * 根据大小和样式获取字体对象
      */
-    private fun getFont(size: Float = -1F, style: Int = -1): Font {
+    protected fun getFont(size: Float = -1F, style: Int = -1): Font {
         var ft = font
         ft = if (size < 0) ft else ft.deriveFont(size)
         ft = if (style < 0) ft else ft.deriveFont(size)
@@ -96,20 +104,21 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
     /**
      * 检查并移动位置( 仅能操作单字符，否则会计算错误
      */
-    private fun checkPos(width: Int, height: Int) {
+    protected fun checkPos(width: Int, height: Int) {
         while (needNextLineNumber.count > 0) {
             nextLineImmediately(height)
             needNextLineNumber.dec()
         }
-        if (lastCharWidth < availableWidth) {
-            moveRight(lastCharWidth)
-            lastCharWidth = width
-        } else {
+        if (lastCharWidth > availableWidth) {
             if (height < availableHeight) {
                 nextLineImmediately(height)
             } else {
                 flush()
             }
+        }
+        moveRight(lastCharWidth)
+        if (width > 0) {
+            lastCharWidth = width
         }
     }
 
@@ -123,6 +132,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
     /**
      * 立即换一行 默认为下一字符的高度
      */
+    @JvmOverloads
     fun nextLineImmediately(height: Int = lastCharHeight) {
         posY += (height + lineSpace)
         resetPosX()
@@ -154,7 +164,6 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
             val charHeight = metrics.height
             checkPos(charWidth, charHeight)
             it.drawString(char.toString(), posX, posY)
-
         }
 
     }
@@ -170,11 +179,11 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
     fun println(text: String = "", size: Float = -1F, style: Int = -1) = print(text + "\n", size, style)
 
     @JvmOverloads
-
     fun insertImage(image: BufferedImage, zoom: Boolean = true) {
         var targetWidth = image.width
         var targetHeight = image.height
         var targetImage = image
+
         if (zoom) {
             if (availableHeight < targetHeight || availableWidth < targetWidth) {
                 val heightDifference = targetHeight - availableHeight
@@ -186,16 +195,72 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
                     // According width
                     availableWidth.toFloat() / targetWidth
                 }
+                if (proportion < 0) {
+                    flush()
+                    insertImage(image, zoom)
+                    return
+                }
                 targetHeight = (targetHeight * proportion).toInt()
                 targetWidth = (targetWidth * proportion).toInt()
                 targetImage = targetImage.scale(targetWidth, targetHeight)
             }
         }
-        nextLineImmediately()
-        "$targetWidth X $targetHeight".log()
-        paper.graphics.drawImage(targetImage, posX, posY, null)
-        posY += targetHeight
+        checkPos(0, targetHeight)
+        paper.graphics.drawImage(targetImage, posX, posY - targetHeight - lineSpace, null)
         nextLine()
+    }
+
+    /**
+     * 大概就是这样的一个效果
+     * [left] = "title "
+     * [fillChar] = '-'
+     * [right] = "10"
+     *
+     * title ------------------------- 10
+     */
+    fun fillLine(left: String, fillChar: Char = '-', right: String, size: Float = -1F, style: Int = -1) {
+        if ('\n' in left || '\n' in right) {
+            error("can not fill line with \\n")
+        }
+        paper.graphics.let {
+            it.font = getFont(size, style)
+            it.color = color
+            if (availableWidth < lineWidth) {
+                nextLine()
+            }
+            val metrics = it.fontMetrics
+            checkPos(0, metrics.height)
+            print(left, size, style)
+            val rightWidth = metrics.stringWidth(right) + right.length * fontSpace
+            if (rightWidth < availableWidth) {
+                val stepLong = metrics.charWidth(fillChar) + fontSpace
+                while (availableWidth - stepLong > rightWidth) {
+                    print(fillChar, size, style)
+                }
+            }
+            print(right, size, style)
+            nextLine()
+        }
+    }
+
+    /**
+     * 用 [string] 来填充本行
+     */
+    fun fillLine(string: String, size: Float = -1F, style: Int = -1) {
+        if ('\n' in string) {
+            error("can not fill line with \\n")
+        }
+        paper.graphics.let {
+            it.font = getFont(size, style)
+            it.color = color
+            val metrics = it.fontMetrics
+            checkPos(0, metrics.height)
+            val stringWidth = metrics.stringWidth(string) + string.length * fontSpace
+            while (availableWidth > stringWidth) {
+                print(string)
+            }
+            nextLine()
+        }
     }
 
     /**
@@ -206,6 +271,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
         feedPaper()
     }
 
+    @Suppress("unused")
     fun reboot() {
         needNextLineNumber.default()
         currentPageNumberCounter.default()

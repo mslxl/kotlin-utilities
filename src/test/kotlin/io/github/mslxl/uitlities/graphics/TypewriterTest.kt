@@ -36,16 +36,52 @@ class TypewriterTest {
                 }
             }
         }
-        Resource(URL("https://www.baidu.com/img/bd_logo1.png")).inputStream { imageStream ->
-            val image = ImageIO.read(imageStream).scale(0.5F)
-            val typewriter = Typewriter(device)
-            typewriter.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
-            typewriter.insertImage(image)
-            typewriter.println("hello,world\n" * 50, 10F)
-            typewriter.insertImage(image)
-            typewriter.insertImage(image)
-            typewriter.flush()
-        }
+        val bilibiliHeader = Resource(URL("http://i0.hdslb.com/bfs/archive/63cb17d6ffaa7357231cea4634c3a2cf10782f49.png")).inputStream { ImageIO.read(it) }
+        val bilibiliIcon = Resource(URL("http://i0.hdslb.com/bfs/archive/26233c9236c4c20f6862c4d1fd56a023c15a1b57.png")).inputStream { ImageIO.read(it) }
+
+        val typewriter = Typewriter(device)
+        typewriter.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.print("hello,world\n" * 25, 10F)
+        typewriter.print("1" * 500, 10F)
+        typewriter.print("#" * 500, 10F)
+        typewriter.println("哔哩哔哩 (゜-゜)つロ 干杯~-bilibili " * 500, 10F)
+        typewriter.insertImage(bilibiliHeader)
+        typewriter.insertImage(bilibiliIcon)
+        typewriter.print("#" * 500, 10F)
+        typewriter.fillLine("Title 1 ", '-', " P1")
+        typewriter.fillLine("Title 2 ", '<', " P2")
+        typewriter.fillLine("Title 3 ", '>', " P3")
+        typewriter.fillLine("Title 4 ", '*', " P4")
+        typewriter.fillLine("Title 5 ", '|', " P5")
+        typewriter.fillLine("^" * 20 + " ", '~', " " + "^" * 15)
+        typewriter.fillLine("#" * 20 + " ", '~', " " + "#" * 15)
+        typewriter.fillLine("哔哩哔哩 (゜-゜)つロ 干杯 ")
+        typewriter.flush()
+
 
     }
 }

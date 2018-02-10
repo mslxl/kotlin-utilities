@@ -19,3 +19,9 @@ inline fun <T : Any> T?.isNotNull(block: (T) -> Unit): T? {
     if (this != null) block.invoke(this)
     return this
 }
+
+inline fun loop(block: () -> Unit) {
+    while (true) {
+        block.invoke()
+    }
+}

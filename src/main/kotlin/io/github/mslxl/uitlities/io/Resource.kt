@@ -15,16 +15,17 @@ class Resource() {
         }
     }
 
-    private lateinit var relativePath: String
+    private lateinit var relativePathRW: String
     val path: String by lazy { file.absolutePath }
     val file: File by lazy { File(resourcesDir, relativePath) }
+    val relativePath get() = relativePathRW
     val uri: URI by lazy { file.toURI() }
     val url: URL by lazy { uri.toURL() }
     private val checkFile: File by lazy { File(resourcesDir, "$path.md5").whether { exists() }.isFalse { createNewFile() }.source }
     inline fun <R> inputStream(block: (InputStream) -> R): R = file.inputStream().use(block)
 
     constructor(pathInClasspath: String) : this() {
-        relativePath = pathInClasspath
+        relativePathRW = pathInClasspath
         mkParentDirs()
         file.whether { exists() }.isFalse {
             Thread.currentThread().contextClassLoader.getResourceAsStream(relativePath).isNotNull {
@@ -40,7 +41,7 @@ class Resource() {
     }
 
     constructor(address: URL, requestProperties: Map<String, String>) : this() {
-        relativePath = "${address.host}/${address.path}"
+        relativePathRW = "${address.host}/${address.path}"
         mkParentDirs()
         file.whether { exists() }.isFalse {
             address.openConnection().apply {
