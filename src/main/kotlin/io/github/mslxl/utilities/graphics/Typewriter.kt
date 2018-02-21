@@ -1,6 +1,5 @@
 package io.github.mslxl.utilities.graphics
 
-import io.github.mslxl.utilities.log.log
 import io.github.mslxl.utilities.num.Counter
 import java.awt.Color
 import java.awt.Font
@@ -104,8 +103,9 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
 
     /**
      * 检查并移动位置( 仅能操作单字符，否则会计算错误
+     * 返回是否需要重绘
      */
-    protected fun checkPos(width: Int, height: Int) {
+    protected fun checkPos(width: Int, height: Int): Boolean {
         while (needNextLineNumber.count > 0) {
             nextLineImmediately(lastCharHeight)
             // 覆盖原本用来别处使用时储存的 lastCharHeight
@@ -115,15 +115,20 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
         if (lastCharWidth > availableWidth) {
             nextLineImmediately(height)
         }
-        if (height > availableHeight) {
+        var needRepaint = false
+        moveRight(lastCharWidth)
+
+        if (height >= availableHeight) {
             flush()
+            needRepaint = true
         }
 
-        moveRight(lastCharWidth)
+
 
         if (width > 0) {
             lastCharWidth = width
         }
+        return needRepaint
     }
 
     /**
@@ -138,7 +143,6 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
      */
     @JvmOverloads
     fun nextLineImmediately(height: Int = lastCharHeight) {
-        height.log()
         posY += (height + lineSpace)
         resetPosX()
         lastCharHeight = height
@@ -168,7 +172,8 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
             val metrics = it.fontMetrics
             val charWidth = metrics.charWidth(char)
             val charHeight = metrics.height
-            checkPos(charWidth, charHeight)
+            if (checkPos(charWidth, charHeight))
+                print(char, size, style)
             it.drawString(char.toString(), posX, posY)
         }
 
@@ -180,9 +185,10 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
             print(it, size, style)
         }
     }
-
     @JvmOverloads
-    fun println(text: String = "", size: Float = -1F, style: Int = -1) = print(text + "\n", size, style)
+    fun println(text: String = "", size: Float = -1F, style: Int = -1) {
+        print(text + "\n", size, style)
+    }
 
     @JvmOverloads
     fun insertImage(image: BufferedImage, zoom: Boolean = true) {
