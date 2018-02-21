@@ -15,7 +15,6 @@ internal class HttpResNotFoundProcessor : ServerResourceProcessor {
                     <hr/>
                     <center><h3>Resource not found:${questQuestHeader.path}</h3></center>
                     <center>${"&nbsp;" * 60}— mslxl's simple server</center>
-
                 </body>
             </html>
         """.trimIndent().byteInputStream()

@@ -20,7 +20,7 @@ class TypewriterTest {
             override fun feed(): BufferedImagePaper {
                 return BufferedImagePaper(BufferedImage(2480, 3580, BufferedImage.TYPE_4BYTE_ABGR)).apply {
                     margin.top = 40
-                    margin.bottom = 100
+                    margin.bottom = 30
                     margin.right = 30
                     margin.left = 30
                 }
@@ -42,20 +42,19 @@ class TypewriterTest {
         val typewriter = Typewriter(device)
         typewriter.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
         typewriter.println("TOP")
-        repeat(30) {
-            typewriter.insertImage(bilibiliHeader)
+        repeat(200) {
+            if(it % 30==0){
+                typewriter.insertImage(bilibiliHeader)
+            }
+            typewriter.fillLine(it.toString(),'-',it.toString(),it % 20 + 10.toFloat())
+
         }
-        typewriter.print("hello,world\n" * 25, 10F)
-        typewriter.print("1" * 500, 10F)
-        typewriter.print("#" * 500, 10F)
-        typewriter.println("哔哩哔哩 (゜-゜)つロ 干杯~-bilibili " * 500, 10F)
         typewriter.insertImage(bilibiliHeader)
         typewriter.insertImage(bilibiliIcon)
         typewriter.print("#" * 500, 10F)
         repeat(90) {
-            typewriter.fillLine("Title $it ", '·', " P$it")
+            typewriter.fillLine("Title $it ", '·', " P$it",it % 10 + 10.toFloat())
         }
-
         typewriter.fillLine("哔哩哔哩 (゜-゜)つロ 干杯 ")
         typewriter.flush()
 

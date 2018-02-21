@@ -1,5 +1,6 @@
 package io.github.mslxl.utilities.graphics
 
+import io.github.mslxl.utilities.log.log
 import io.github.mslxl.utilities.num.Counter
 import java.awt.Color
 import java.awt.Font
@@ -137,6 +138,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
      */
     @JvmOverloads
     fun nextLineImmediately(height: Int = lastCharHeight) {
+        height.log()
         posY += (height + lineSpace)
         resetPosX()
         lastCharHeight = height
@@ -199,18 +201,20 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
                     // According width
                     availableWidth.toFloat() / targetWidth
                 }
-                if (proportion < 0) {
+
+                targetHeight = (targetHeight * proportion).toInt()
+                targetWidth = (targetWidth * proportion).toInt()
+                if (targetHeight <= 0 || targetWidth <= 0){
                     flush()
                     insertImage(image, zoom)
                     return
                 }
-                targetHeight = (targetHeight * proportion).toInt()
-                targetWidth = (targetWidth * proportion).toInt()
                 targetImage = targetImage.scale(targetWidth, targetHeight)
             }
         }
         checkPos(0, targetHeight)
         paper.graphics.drawImage(targetImage, posX, posY, null)
+        nextLine()
         nextLine()
     }
 
