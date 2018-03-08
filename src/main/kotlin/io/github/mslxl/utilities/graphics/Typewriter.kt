@@ -3,6 +3,7 @@ package io.github.mslxl.utilities.graphics
 import io.github.mslxl.utilities.num.Counter
 import java.awt.Color
 import java.awt.Font
+import java.awt.Graphics
 import java.awt.image.BufferedImage
 
 
@@ -97,7 +98,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
     protected fun getFont(size: Float = -1F, style: Int = -1): Font {
         var ft = font
         ft = if (size < 0) ft else ft.deriveFont(size)
-        ft = if (style < 0) ft else ft.deriveFont(size)
+        ft = if (style < 0) ft else ft.deriveFont(style)
         return ft
     }
 
@@ -105,30 +106,29 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
      * 检查并移动位置( 仅能操作单字符，否则会计算错误
      * 返回是否需要重绘
      */
-    protected fun checkPos(width: Int, height: Int): Boolean {
-        while (needNextLineNumber.count > 0) {
-            nextLineImmediately(lastCharHeight)
-            // 覆盖原本用来别处使用时储存的 lastCharHeight
-            lastCharHeight = height
-            needNextLineNumber.dec()
-        }
+    protected fun checkPos(width: Int, height: Int) {
+        doNextLine(height)
         if (lastCharWidth > availableWidth) {
             nextLineImmediately(height)
         }
-        var needRepaint = false
         moveRight(lastCharWidth)
-
         if (height >= availableHeight) {
             flush()
-            needRepaint = true
+            doNextLine(height)
         }
-
-
-
         if (width > 0) {
             lastCharWidth = width
         }
-        return needRepaint
+    }
+
+
+    private fun doNextLine(lineHeight: Int) {
+        while (needNextLineNumber.count > 0) {
+            nextLineImmediately(lastCharHeight)
+            // 覆盖原本用来别处使用时储存的 lastCharHeight
+            lastCharHeight = lineHeight
+            needNextLineNumber.dec()
+        }
     }
 
     /**
@@ -167,29 +167,36 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
         }
 
         paper.graphics.let {
-            it.font = getFont(size, style)
-            it.color = color
+            it.initPaint(size, style)
             val metrics = it.fontMetrics
             val charWidth = metrics.charWidth(char)
             val charHeight = metrics.height
-            if (checkPos(charWidth, charHeight))
-                print(char, size, style)
-            it.drawString(char.toString(), posX, posY)
+            checkPos(charWidth, charHeight)
+            // 使用新的 graphic
+            // 以确保画在最新页上
+            paper.graphics.let {
+                it.initPaint(size, style)
+                it.drawString(char.toString(), posX, posY)
+            }
         }
 
     }
 
+    var de = false
     @JvmOverloads
     fun print(text: String, size: Float = -1F, style: Int = -1) {
         text.forEach {
             print(it, size, style)
+            de = false
         }
     }
     @JvmOverloads
     fun println(text: String = "", size: Float = -1F, style: Int = -1) {
+        de = text.startsWith("184")
         print(text + "\n", size, style)
     }
 
+    @Suppress("unused")
     @JvmOverloads
     fun insertImage(image: BufferedImage, zoom: Boolean = true) {
         var targetWidth = image.width
@@ -289,6 +296,10 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
         feedPaper()
     }
 
+    private fun Graphics.initPaint(size: Float, style: Int) {
+        this.font = getFont(size, style)
+        this.color = this@Typewriter.color
+    }
     init {
         feedPaper()
     }
