@@ -34,7 +34,7 @@ private fun preLog(tag: String, config: LoggerConfig = GlobalLoggerConfig): Stri
     return "$textTag$textTime$textStartTime"
 }
 
-fun <T : Any?> T.log(tag: String = "Log", config: LoggerConfig = GlobalLoggerConfig): T {
+fun <T : Any?> T.log(tag: String = whoCalledMe().intellijLink, config: LoggerConfig = GlobalLoggerConfig): T {
     log(tag, this, config = config)
     return this
 }

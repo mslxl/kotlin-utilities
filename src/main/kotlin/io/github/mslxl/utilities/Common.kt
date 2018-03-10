@@ -14,3 +14,10 @@ inline fun <R> catch(log: Boolean = true, tag: String = "Exception", block: () -
     }
 }
 
+val Runtime = java.lang.Runtime.getRuntime()
+
+@Deprecated("TODO")
+fun doSomeThing() {
+}
+
+fun doNoting() {}

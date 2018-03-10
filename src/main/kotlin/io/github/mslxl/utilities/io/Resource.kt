@@ -35,8 +35,8 @@ class Resource() {
                     it.copyTo(output)
                 }
             }.isNull {
-                        error("$pathInClasspath not exists, check it exists or be loaded.")
-                    }
+                error("$pathInClasspath not exists, check it exists or be loaded.")
+            }
         }
     }
 

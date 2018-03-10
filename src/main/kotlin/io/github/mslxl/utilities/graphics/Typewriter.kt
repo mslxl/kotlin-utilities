@@ -190,6 +190,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
             de = false
         }
     }
+
     @JvmOverloads
     fun println(text: String = "", size: Float = -1F, style: Int = -1) {
         de = text.startsWith("184")
@@ -217,7 +218,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
 
                 targetHeight = (targetHeight * proportion).toInt()
                 targetWidth = (targetWidth * proportion).toInt()
-                if (targetHeight <= 0 || targetWidth <= 0){
+                if (targetHeight <= 0 || targetWidth <= 0) {
                     flush()
                     insertImage(image, zoom)
                     return
@@ -300,6 +301,7 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
         this.font = getFont(size, style)
         this.color = this@Typewriter.color
     }
+
     init {
         feedPaper()
     }
