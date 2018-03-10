@@ -182,18 +182,15 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
 
     }
 
-    var de = false
     @JvmOverloads
     fun print(text: String, size: Float = -1F, style: Int = -1) {
         text.forEach {
             print(it, size, style)
-            de = false
         }
     }
 
     @JvmOverloads
     fun println(text: String = "", size: Float = -1F, style: Int = -1) {
-        de = text.startsWith("184")
         print(text + "\n", size, style)
     }
 
@@ -232,7 +229,8 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
         nextLine()
     }
 
-    /**
+    @Suppress("unused")
+            /**
      * 大概就是这样的一个效果
      * [left] = "title "
      * [fillChar] = '-'
@@ -262,7 +260,8 @@ open class Typewriter<PaperType : Paper>(private val paperSupport: PaperSupportD
         }
     }
 
-    /**
+    @Suppress("unused")
+            /**
      * 用 [string] 来填充本行
      */
     fun fillLine(string: String, size: Float = -1F, style: Int = -1) {
