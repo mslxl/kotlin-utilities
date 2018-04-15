@@ -13,6 +13,8 @@ val USER_LANGUAGE = property("user.language")
 
 val USER_DIR = property("user.dir")
 
+val USER_HOME = property("user.home")
+
 val USER_COUNTRY = property("user.country")
 
 val USER_COUNTRY_FORMAT = property("user.country.format")
