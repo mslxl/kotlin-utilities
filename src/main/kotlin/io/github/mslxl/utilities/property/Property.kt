@@ -8,8 +8,10 @@ typealias PropertyLinstener<T> = (old: T, new: T) -> Unit
 
 open class Property<T : Any>(@Expose(serialize = true, deserialize = true) private var property: T) : Cloneable {
 
+    // Gson 会赋值为 Null 真是太感人了
     @Expose(serialize = false, deserialize = false)
-    private val listeners = ArrayList<PropertyLinstener<T>>()
+    @Volatile
+    private var listeners: ArrayList<PropertyLinstener<T>>? = null
 
 
     val value get():T = property
@@ -21,7 +23,10 @@ open class Property<T : Any>(@Expose(serialize = true, deserialize = true) priva
     }
 
     fun listener(listener: PropertyLinstener<T>) {
-        listeners.add(listener)
+        if (listeners == null) {
+            listeners = ArrayList()
+        }
+        listeners!!.add(listener)
     }
 
     fun bind(property: Property<T>) = bind(property) { return@bind it }
@@ -31,8 +36,9 @@ open class Property<T : Any>(@Expose(serialize = true, deserialize = true) priva
         }
     }
 
+    @Synchronized
     private fun onChange(old: T, new: T) {
-        listeners.forEach {
+        listeners?.forEach {
             try {
                 it.invoke(old, new)
             } catch (e: Exception) {
