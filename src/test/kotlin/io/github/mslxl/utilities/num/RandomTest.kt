@@ -1,6 +1,5 @@
 package io.github.mslxl.utilities.num
 
-import io.github.mslxl.utilities.log.log
 import org.junit.Test
 
 class RandomTest {
@@ -14,10 +13,5 @@ class RandomTest {
             val int = random(1, 10)
             map[int]!!.inc()
         }
-        "The number of result:${map.size}".log("RandomTest")
-        map.forEach { t, u ->
-            "There are ${u.count} of $t".log("RandomTest")
-        }
-
     }
 }

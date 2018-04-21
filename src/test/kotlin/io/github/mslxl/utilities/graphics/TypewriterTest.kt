@@ -7,7 +7,6 @@ import org.junit.Test
 import java.awt.Font
 import java.awt.image.BufferedImage
 import java.io.File
-import java.net.URL
 import javax.imageio.ImageIO
 
 class TypewriterTest {
@@ -35,9 +34,6 @@ class TypewriterTest {
                 }
             }
         }
-        val bilibiliHeader = Resource(URL("http://i0.hdslb.com/bfs/archive/63cb17d6ffaa7357231cea4634c3a2cf10782f49.png")).inputStream { ImageIO.read(it) }
-        val bilibiliIcon = Resource(URL("http://i0.hdslb.com/bfs/archive/26233c9236c4c20f6862c4d1fd56a023c15a1b57.png")).inputStream { ImageIO.read(it) }
-
         val typewriter = Typewriter(device)
         typewriter.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
         typewriter.println("TOP")
