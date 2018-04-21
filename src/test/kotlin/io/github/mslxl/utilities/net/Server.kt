@@ -1,7 +1,5 @@
 package io.github.mslxl.utilities.net
 
-import io.github.mslxl.utilities.io.Resource
-
 class Server {
     companion object {
         @JvmStatic

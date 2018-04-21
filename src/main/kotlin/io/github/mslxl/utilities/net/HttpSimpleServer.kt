@@ -1,6 +1,5 @@
 package io.github.mslxl.utilities.net
 
-import io.github.mslxl.utilities.io.Resource
 import io.github.mslxl.utilities.logic.loop
 import java.io.File
 import java.net.ServerSocket
@@ -72,8 +71,4 @@ class HttpSimpleServer(@Suppress("CanBeParameter") val port: Int = 80) {
         resourcesTree[path] = processor
     }
 
-    fun addResource(resource: Resource) {
-        addFileResource(resource.file, "/" + resource.relativePath)
-        print(resource)
-    }
 }

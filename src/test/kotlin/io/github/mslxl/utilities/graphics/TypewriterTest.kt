@@ -1,6 +1,5 @@
 package io.github.mslxl.utilities.graphics
 
-import io.github.mslxl.utilities.io.Resource
 import io.github.mslxl.utilities.logic.whether
 import io.github.mslxl.utilities.num.Counter
 import io.github.mslxl.utilities.string.times
