@@ -2,10 +2,13 @@
 
 package io.github.mslxl.utilities.property
 
+import com.google.gson.annotations.Expose
+
 typealias PropertyLinstener<T> = (old: T, new: T) -> Unit
 
 open class Property<T : Any>(private var property: T) : Cloneable {
 
+    @Expose(serialize = false, deserialize = false)
     private val listeners = ArrayList<PropertyLinstener<T>>()
 
     val value get():T = property
