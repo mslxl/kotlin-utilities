@@ -6,10 +6,11 @@ import com.google.gson.annotations.Expose
 
 typealias PropertyLinstener<T> = (old: T, new: T) -> Unit
 
-open class Property<T : Any>(private var property: T) : Cloneable {
+open class Property<T : Any>(@Expose(serialize = true, deserialize = true) private var property: T) : Cloneable {
 
     @Expose(serialize = false, deserialize = false)
     private val listeners = ArrayList<PropertyLinstener<T>>()
+
 
     val value get():T = property
     inline fun <R> value(block: (T) -> R): R? = value.let(block)
