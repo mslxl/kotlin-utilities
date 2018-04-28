@@ -27,6 +27,11 @@ open class Property<T : Any>(@Expose(serialize = true, deserialize = true) priva
             listeners = ArrayList()
         }
         listeners!!.add(listener)
+        try {
+            listener.invoke(value, value)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun bind(property: Property<T>) = bind(property) { return@bind it }
@@ -38,6 +43,7 @@ open class Property<T : Any>(@Expose(serialize = true, deserialize = true) priva
 
     @Synchronized
     private fun onChange(old: T, new: T) {
+        if (old == new) return
         listeners?.forEach {
             try {
                 it.invoke(old, new)
