@@ -1,31 +1,14 @@
 package io.github.mslxl.utilities.logic
 
-import java.util.*
-import kotlin.collections.HashMap
-
-class StatisticsMap<K : Any, V : Any>() {
-    private val hashMap = HashMap<K, LinkedList<V>>()
-
-    operator fun get(key: K): List<V> {
-        return if (hashMap.containsKey(key))
-            hashMap[key]!!
-        else
-            emptyList()
+class StatisticsMap<K, V, MAP : MutableMap<K, V>>(private val map: MutableMap<K, V>, private val create: () -> V) : MutableMap<K, V> by map {
+    override fun get(key: K): V {
+        if (!map.containsKey(key))
+            map[key] = create.invoke()
+        return map[key]!!
     }
 
-    fun add(key: K, item: V) {
-        if (!hashMap.containsKey(key)) {
-            hashMap[key] = LinkedList()
-        }
-        hashMap[key]!!.add(item)
-    }
-
-    val keys get() = hashMap.keys.toSet()
-
-    inline fun forEach(block: (key: K, list: List<V>) -> Unit) {
-        keys.forEach { key ->
-            val list = get(key)
-            block.invoke(key, list)
-        }
+    @Deprecated("Using get instead of getOrDefault", ReplaceWith("get"), DeprecationLevel.ERROR)
+    override fun getOrDefault(key: K, defaultValue: V): V {
+        return get(key)
     }
 }

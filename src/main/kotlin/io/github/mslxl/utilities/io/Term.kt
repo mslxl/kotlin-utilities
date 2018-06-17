@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.thread
 
 fun shell(command: String, charset: Charset = Charset.defaultCharset()) = ShellProcess(Runtime.exec(command), charset)
+fun shell(file: String, vararg args: String, charset: Charset = Charset.defaultCharset()) = ShellProcess(Runtime.exec(arrayOf(file, *args)), charset)
 
 typealias OutListener = (line: String) -> Unit
 
