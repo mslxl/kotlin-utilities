@@ -1,6 +1,7 @@
 package io.github.mslxl.utilities.num
 
 import io.github.mslxl.utilities.logic.StatisticsMap
+import java.util.*
 
 class Counter(private val initValue: Int = 0) {
     private var value = initValue
@@ -9,7 +10,9 @@ class Counter(private val initValue: Int = 0) {
             field = value
         }
 
-    private val map = StatisticsMap<Int, (Int) -> Unit>()
+    private val map = StatisticsMap<Int, LinkedList<(Int) -> Unit>, HashMap<Int, LinkedList<(Int) -> Unit>>>(HashMap()) {
+        LinkedList()
+    }
 
     fun inc(): Int {
         return ++value
@@ -33,6 +36,6 @@ class Counter(private val initValue: Int = 0) {
     }
 
     fun on(index: Int, block: (Int) -> Unit) {
-        map.add(index, block)
+        map[index].add(block)
     }
 }
