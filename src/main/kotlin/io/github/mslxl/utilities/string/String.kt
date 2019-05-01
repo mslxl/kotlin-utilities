@@ -4,16 +4,13 @@ package io.github.mslxl.utilities.string
 
 import java.net.URI
 
-fun Array<*>.mkString(prefix: String, divider: String, suffix: String): String {
+fun Array<*>.mkString(prefix: String = "[", divider: String = ",", suffix: String = "]"): String {
     val str = reduce { acc, any ->
         acc.toString() + divider + any.toString()
     }
     return "$prefix$str$suffix"
 }
 
-fun Array<*>.mkString(divider: String): String {
-    return mkString("", divider, "")
-}
 
 inline operator fun StringBuilder.plusAssign(str: String) {
     append(str)

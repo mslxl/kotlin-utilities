@@ -32,19 +32,24 @@ class HttpSimpleServer(@Suppress("CanBeParameter") val port: Int = 80) {
         thread {
             val input = socket.getInputStream()
             val reader = input.bufferedReader()
-            val httpHeaderBuilder = StringBuilder()
-            var line = ""
-            while (reader.readLine()?.let { line = it;it.isNotBlank() } == true) {
-                httpHeaderBuilder.appendln(line)
-            }
-            val header = HttpQuestHeader.parse(httpHeaderBuilder.toString())
-            val processor = if (resourcesTree.containsKey(header.path))
-                resourcesTree[header.path]!!
+
+            val header = HttpRequestHeader.parse(
+                    buildString {
+                        var line = ""
+                        while (reader.readLine()?.let { line = it;it.isNotBlank() } == true) {
+                            appendln(line)
+                        }
+                    }
+            )
+
+            val requestUrl = header.url.substringBeforeLast('?')
+            val processor = if (resourcesTree.containsKey(requestUrl))
+                resourcesTree[requestUrl]!!
             else
                 resourcesTree["/404"]!!
 
+
             val respond = HttpRespondHeader(200, "OK")
-            respond["Content-Length"] = 0.toString()
             val stream = processor.process(header, input, respond)
             if (stream != null) {
                 respond["Content-Length"] = stream.available().toString()

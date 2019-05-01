@@ -2,16 +2,15 @@
 
 package io.github.mslxl.utilities.io
 
-import io.github.mslxl.utilities.Runtime
-import io.github.mslxl.utilities.doNoting
+
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.thread
 
-fun shell(command: String, charset: Charset = Charset.defaultCharset()) = ShellProcess(Runtime.exec(command), charset)
-fun shell(file: String, vararg args: String, charset: Charset = Charset.defaultCharset()) = ShellProcess(Runtime.exec(arrayOf(file, *args)), charset)
+fun shell(command: String, charset: Charset = Charset.defaultCharset()) = ShellProcess(Runtime.getRuntime().exec(command), charset)
+fun shell(file: String, vararg args: String, charset: Charset = Charset.defaultCharset()) = ShellProcess(Runtime.getRuntime().exec(arrayOf(file, *args)), charset)
 
 typealias OutListener = (line: String) -> Unit
 
@@ -101,7 +100,7 @@ class ShellProcess internal constructor(val process: Process, val charset: Chars
         try {
             stdIn.close()
         } catch (e: IOException) {
-            doNoting()
+            e.printStackTrace()
         }
     }
 

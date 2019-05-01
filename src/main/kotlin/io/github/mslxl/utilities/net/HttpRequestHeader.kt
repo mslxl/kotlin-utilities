@@ -1,10 +1,10 @@
 package io.github.mslxl.utilities.net
 
-class HttpQuestHeader {
+class HttpRequestHeader {
     companion object {
         private val regex = "(.*):\\s(.*)".toRegex()
-        fun parse(header: String): HttpQuestHeader {
-            val headerObj = HttpQuestHeader()
+        fun parse(header: String): HttpRequestHeader {
+            val headerObj = HttpRequestHeader()
             if (header.isBlank()) {
                 error("Illegal HTTP headers")
             }
@@ -12,7 +12,7 @@ class HttpQuestHeader {
 
             firstLine.split(' ').apply {
                 headerObj.method = component1()
-                headerObj.path = component2()
+                headerObj.url = component2()
                 headerObj.version = component3()
             }
 
@@ -27,7 +27,7 @@ class HttpQuestHeader {
     }
 
     lateinit var method: String
-    lateinit var path: String
+    lateinit var url: String
     lateinit var version: String
     private val content = HashMap<String, String>()
     operator fun get(key: String): String? {
@@ -46,7 +46,7 @@ class HttpQuestHeader {
         return buildString {
             append(method)
             append(' ')
-            append(path)
+            append(url)
             append(' ')
             append(version)
             appendln()

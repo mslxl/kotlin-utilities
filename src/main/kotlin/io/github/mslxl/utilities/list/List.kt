@@ -2,8 +2,9 @@
 
 package io.github.mslxl.utilities.list
 
-inline operator fun <T : java.util.AbstractList<TT>, TT> T.plus(item: Collection<TT>) {
+inline operator fun <T : java.util.AbstractList<TT>, TT> T.plus(item: Collection<TT>): T {
     addAll(item)
+    return this
 }
 
 inline operator fun <T : java.util.AbstractList<TT>, TT> T.plus(item: TT): T {
