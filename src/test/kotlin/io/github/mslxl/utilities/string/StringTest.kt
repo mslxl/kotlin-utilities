@@ -8,7 +8,7 @@ class StringTest {
     @Test
     fun mkString() {
         arrayOf("h", "e", "l", "l", "o").mkString("[", ",", "]") shouldBe "[h,e,l,l,o]"
-        arrayOf("h", "e", "l", "l", "o").mkString(",") shouldBe "h,e,l,l,o"
+        arrayOf("h", "e", "l", "l", "o").mkString(divider = ",") shouldBe "[h,e,l,l,o]"
     }
 
     @Test
