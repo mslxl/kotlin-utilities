@@ -1,4 +1,4 @@
-package io.github.mslxl.utilities.net
+package io.github.mslxl.utilities.net.simplehttp
 
 class HttpRequestHeader {
     companion object {

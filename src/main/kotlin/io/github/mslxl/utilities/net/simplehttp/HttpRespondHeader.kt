@@ -1,4 +1,4 @@
-package io.github.mslxl.utilities.net
+package io.github.mslxl.utilities.net.simplehttp
 
 class HttpRespondHeader(var code: Int, var msg: String) {
     val version: String = "HTTP/1.1"

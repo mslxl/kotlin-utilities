@@ -1,4 +1,4 @@
-package io.github.mslxl.utilities.net
+package io.github.mslxl.utilities.net.simplehttp
 
 import io.github.mslxl.utilities.logic.loop
 import java.io.File

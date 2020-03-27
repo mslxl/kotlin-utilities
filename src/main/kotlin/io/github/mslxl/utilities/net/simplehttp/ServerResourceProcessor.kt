@@ -1,4 +1,4 @@
-package io.github.mslxl.utilities.net
+package io.github.mslxl.utilities.net.simplehttp
 
 import io.github.mslxl.utilities.string.times
 import java.io.InputStream

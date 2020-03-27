@@ -4,10 +4,10 @@ import kotlin.math.acos
 import kotlin.math.sqrt
 
 @Suppress("FunctionName", "NonAsciiCharacters")
-class Vector(val x: Float, val y: Float) {
+open class Vector(val x: Double, val y: Double) {
     companion object {
-        val unitX = Vector(1F, 0F)
-        val unitY = Vector(0F, 1F)
+        val unitX = Vector(1.0, 0.0)
+        val unitY = Vector(0.0, 1.0)
     }
 
     operator fun plus(v: Vector) = Vector(x + v.x, y + v.y)
@@ -18,9 +18,9 @@ class Vector(val x: Float, val y: Float) {
 
     fun inv() = Vector(-x, -y)
 
-    infix fun `·`(v: Vector) = x * v.x + y * v.y
+    infix fun `·`(v: Vector): Double = x * v.x + y * v.y
 
-    fun isVertical(v: Vector) = `·`(v) == 0F
+    fun isVertical(v: Vector) = `·`(v) == 0.0
     infix fun `⊥`(v: Vector) = isVertical(v)
 
     infix fun `==λ`(v: Vector) = x * v.y == y * v.x
