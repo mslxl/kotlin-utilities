@@ -1,4 +1,4 @@
-package test.num
+package io.github.mslxl.utilities.num
 
 import io.github.mslxl.utilities.logic.StatisticsMap
 import java.util.*

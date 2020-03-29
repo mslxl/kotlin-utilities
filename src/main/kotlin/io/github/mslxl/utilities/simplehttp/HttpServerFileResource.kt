@@ -1,4 +1,4 @@
-package test.net.simplehttp
+package io.github.mslxl.utilities.simplehttp
 
 import java.io.File
 import java.io.InputStream

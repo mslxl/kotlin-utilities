@@ -1,5 +1,7 @@
 package test.automata
 
+import io.github.mslxl.utilities.automata.DeterministicFiniteAutomata
+import io.github.mslxl.utilities.automata.moveTo
 import org.junit.Test
 import shouldBe
 

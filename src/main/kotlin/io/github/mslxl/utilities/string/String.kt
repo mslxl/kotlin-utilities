@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package test.string
+package io.github.mslxl.utilities.string
 
 inline operator fun StringBuilder.plusAssign(str: String) {
     append(str)

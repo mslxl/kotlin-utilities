@@ -1,6 +1,7 @@
 package test.string
 
 
+import io.github.mslxl.utilities.string.formatByPair
 import org.junit.Test
 import shouldBe
 

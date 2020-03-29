@@ -1,9 +1,9 @@
 package sample.server
 
-import test.net.simplehttp.HttpRequestHeader
-import test.net.simplehttp.HttpRespondHeader
-import test.net.simplehttp.HttpSimpleServer
-import test.net.simplehttp.ServerResourceProcessor
+import io.github.mslxl.utilities.simplehttp.HttpRequestHeader
+import io.github.mslxl.utilities.simplehttp.HttpRespondHeader
+import io.github.mslxl.utilities.simplehttp.HttpSimpleServer
+import io.github.mslxl.utilities.simplehttp.ServerResourceProcessor
 import java.io.InputStream
 
 class Server {

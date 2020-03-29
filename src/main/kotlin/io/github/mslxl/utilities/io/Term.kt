@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE", "unused")
 
-package test.io
+package io.github.mslxl.utilities.io
 
 
 import java.io.IOException

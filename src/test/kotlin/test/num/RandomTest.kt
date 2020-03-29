@@ -1,5 +1,7 @@
 package test.num
 
+import io.github.mslxl.utilities.num.Counter
+import io.github.mslxl.utilities.num.random
 import org.junit.Test
 
 class RandomTest {

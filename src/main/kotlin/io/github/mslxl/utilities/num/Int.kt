@@ -1,4 +1,4 @@
-package test.num
+package io.github.mslxl.utilities.num
 
 import java.util.*
 

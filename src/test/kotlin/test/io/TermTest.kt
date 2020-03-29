@@ -1,6 +1,7 @@
 package test.io
 
 import io.github.mslxl.utilities.SysProperty.OS_TYPE
+import io.github.mslxl.utilities.io.shell
 import io.github.mslxl.utilities.os.OS
 import org.junit.Test
 import shouldBe

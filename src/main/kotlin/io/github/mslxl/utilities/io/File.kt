@@ -1,4 +1,4 @@
-package test.io
+package io.github.mslxl.utilities.io
 
 import io.github.mslxl.utilities.logic.loop
 import java.io.File

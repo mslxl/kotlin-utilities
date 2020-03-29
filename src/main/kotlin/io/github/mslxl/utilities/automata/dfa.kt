@@ -1,4 +1,4 @@
-package test.automata
+package io.github.mslxl.utilities.automata
 
 abstract class DeterministicFiniteAutomata<StateName, Output> {
     private val stateSet = emptyMap<StateName, State<StateName>>().toMutableMap()

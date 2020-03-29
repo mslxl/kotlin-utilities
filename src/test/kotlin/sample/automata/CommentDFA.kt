@@ -1,6 +1,6 @@
 package sample.automata
 
-import test.automata.DeterministicFiniteAutomata
+import io.github.mslxl.utilities.automata.DeterministicFiniteAutomata
 
 class CommentDFA : DeterministicFiniteAutomata<Int, String>() {
     companion object {

@@ -1,6 +1,6 @@
-package test.net.simplehttp
+package io.github.mslxl.utilities.simplehttp
 
-import test.string.times
+import io.github.mslxl.utilities.string.times
 import java.io.InputStream
 
 interface ServerResourceProcessor {
