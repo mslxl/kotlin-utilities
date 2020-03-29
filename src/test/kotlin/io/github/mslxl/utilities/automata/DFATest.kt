@@ -7,34 +7,33 @@ class DFATest {
     fun test() {
         val dfa = DFA()
 
-        val tokens = dfa.process("1+234=hoshiro")
+        val tokens = dfa.process("1+234=95")
         println(tokens)
     }
 }
 
 class DFA : DeterministicFiniteAutomata<String, Token>() {
     override val start = state("START") {
-        ('0'..'9').map(this::on).forEach { state ->
-            state moveTo "digit"
-        }
-        "+-*/%".map(this::on).forEach { state ->
-            state moveTo "op"
-        }
+        state on ('0'..'9') moveTo "digit"
+        state onOneOf "+-*/%" moveTo "op"
         state on '=' moveTo "assign"
     }
 
     init {
         finalState("digit") {
-            ('0'..'9').map(this::on).forEach { state ->
-                state moveTo "digit"
-                output {
-                    return@output Token("number", it)
-                }
+            state on '0'..'9' moveTo "digit"
+            output {
+                return@output Token("number", it)
             }
         }
         finalState("op") {
             output {
                 Token(it, "")
+            }
+        }
+        finalState("assign") {
+            output {
+                Token("=", "")
             }
         }
     }

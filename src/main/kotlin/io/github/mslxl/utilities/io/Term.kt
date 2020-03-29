@@ -24,7 +24,7 @@ class ShellProcess internal constructor(val process: Process, val charset: Chars
     private fun readFromStreamIfAlive(inputStream: InputStream, listener: OutListener) {
         do {
             if (inputStream.available() > 0)
-                inputStream.readAvailableAsString(charset).let(listener)
+                inputStream.readBytes().toString(charset).let(listener)
             Thread.sleep(500)
         } while (process.isAlive)
     }

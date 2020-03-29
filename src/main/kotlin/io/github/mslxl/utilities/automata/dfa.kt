@@ -71,7 +71,12 @@ abstract class DeterministicFiniteAutomata<StateName, Output> {
                         ?.let { stateSet[it.first]!! as FinalState<StateName, Output> to it.second }
 
                 if (lastFinalState == null) {
-                    error("No corresponding directed edge")
+                    if (currentState.default != null) {
+                        head++
+                        statePath.add(currentState.default!!)
+                    } else {
+                        error("No corresponding directed edge: $curChar")
+                    }
                 } else {
                     // 恐慌模式
 
@@ -111,11 +116,21 @@ abstract class DeterministicFiniteAutomata<StateName, Output> {
 open class State<T>(val stateName: T) {
     protected val transitionMapMutable = hashMapOf<Char, T>()
     val transitionMap: Map<Char, T> = transitionMapMutable
+    var default: T? = null
+        protected set
 }
 
 inline class StateArrow<T>(val data: Pair<Char, MutableState<T>>) {
     infix fun moveTo(stateTag: T) {
         data.second.move(data.first, stateTag)
+    }
+
+}
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <T> List<StateArrow<T>>.moveTo(stateTag: T) {
+    forEach {
+        it.moveTo(stateTag)
     }
 }
 
@@ -125,8 +140,20 @@ open class MutableState<T>(stateTag: T) : State<T>(stateTag) {
         transitionMapMutable[condition] = stateTag
     }
 
+    infix fun defaultTo(stateTag: T) {
+        default = stateTag
+    }
+
     infix fun on(condition: Char): StateArrow<T> {
         return StateArrow(condition to this)
+    }
+
+    infix fun onOneOf(condition: String): List<StateArrow<T>> {
+        return condition.map(::on)
+    }
+
+    infix fun on(condition: CharRange): List<StateArrow<T>> {
+        return condition.map(::on)
     }
 }
 

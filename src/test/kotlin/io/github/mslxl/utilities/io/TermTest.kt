@@ -2,8 +2,8 @@ package io.github.mslxl.utilities.io
 
 import io.github.mslxl.utilities.SysProperty.OS_TYPE
 import io.github.mslxl.utilities.os.OS
-import io.kotlintest.matchers.shouldBe
 import org.junit.Test
+import shouldBe
 
 class TermTest {
     @Test
